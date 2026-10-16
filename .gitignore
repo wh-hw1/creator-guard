@@ -2,5 +2,8 @@ __pycache__/
 *.pyc
 .venv/
 venv/
-.streamlit/secrets.toml
 .env
+
+# API 키 등 비밀 정보 (절대 GitHub에 올리지 않음)
+.streamlit/secrets.toml
+secrets.toml
