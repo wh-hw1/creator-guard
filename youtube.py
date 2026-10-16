@@ -7,6 +7,7 @@ from urllib.parse import parse_qs, urlparse
 import requests
 
 API_URL = "https://www.googleapis.com/youtube/v3/commentThreads"
+VIDEOS_URL = "https://www.googleapis.com/youtube/v3/videos"
 MAX_COMMENTS = 50
 KST = timezone(timedelta(hours=9))
 
@@ -80,6 +81,23 @@ def fetch_comments(video_id: str, api_key: str) -> list[dict]:
             }
         )
     return comments
+
+
+def fetch_video_info(video_id: str, api_key: str) -> dict | None:
+    """영상 제목과 채널명을 가져옵니다. AI 분석의 참고 정보이므로 실패하면 None을 반환합니다."""
+    try:
+        response = requests.get(
+            VIDEOS_URL,
+            params={"part": "snippet", "id": video_id, "key": api_key},
+            timeout=10,
+        )
+        items = response.json().get("items", []) if response.status_code == 200 else []
+    except (requests.RequestException, ValueError):
+        return None
+    if not items:
+        return None
+    snippet = items[0]["snippet"]
+    return {"title": snippet.get("title", ""), "channel": snippet.get("channelTitle", "")}
 
 
 def _error_message(response: requests.Response) -> str:
